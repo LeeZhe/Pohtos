@@ -11,8 +11,7 @@
 #import "ScanPhotowsVC.h"
 #import <Photos/Photos.h>
 @interface DisplayPhotosVC : UICollectionViewController
-@property (nonatomic, strong)NSArray<PHAsset *> *assets;
-@property (nonatomic, strong)NSArray <UIImage *> *images;
+@property (nonatomic, strong)NSArray <NSArray *> *images;
 @end
 
 @interface CaModel : NSObject
@@ -28,3 +27,9 @@
 @interface DisCell : UICollectionViewCell
 @property (nonatomic, strong)UIImageView *disView;
 @end
+
+@interface DisResuableView : UICollectionReusableView
+@property (nonatomic, strong)UILabel *label;
+@end
+
+

@@ -199,6 +199,8 @@
 				40A9500B20669C0B008EC85B /* ScanPhotowsVC.m */,
 				40A9500D20669C4F008EC85B /* ScanPhotosCell.h */,
 				40A9500E20669C4F008EC85B /* ScanPhotosCell.m */,
+				40A950552066A85E008EC85B /* DisplayPhotosVC.h */,
+				40A950562066A85E008EC85B /* DisplayPhotosVC.m */,
 			);
 			path = ATest;
 			sourceTree = "<group>";
@@ -226,8 +228,6 @@
 			children = (
 				40A9505A2066AD28008EC85B /* Category */,
 				40A950112066A1CC008EC85B /* XMNPhotoPickerFramework */,
-				40A950552066A85E008EC85B /* DisplayPhotosVC.h */,
-				40A950562066A85E008EC85B /* DisplayPhotosVC.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";

@@ -9,18 +9,18 @@
 #import "DisplayPhotosVC.h"
 #import <Photos/Photos.h>
 #import "Category.h"
-#import "XMNAssetModel.h"
 #import <CoreLocation/CoreLocation.h>
 
 @interface DisplayPhotosVC ()<UICollectionViewDelegateFlowLayout>
 @property (nonatomic, strong)CLGeocoder *geo;
-@property (nonatomic, strong)NSMutableArray<CaModel *> *sources;
 @end
 
 @implementation DisplayPhotosVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.title = @"My Momment";
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -29,6 +29,15 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     [self.collectionView registerClass:[DisCell class] forCellWithReuseIdentifier:NSStringFromClass([DisCell class])];
     self.collectionView.layer.backgroundColor = [UIColor whiteColor].CGColor;
+    [self.collectionView registerClass:[DisResuableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:NSStringFromClass([DisResuableView class])];
+}
+
+- (instancetype)initWithCollectionViewLayout:(UICollectionViewLayout *)layout{
+    if ([super initWithCollectionViewLayout:layout]) {
+        UICollectionViewFlowLayout *layoUT = (UICollectionViewFlowLayout *)layout;
+        layoUT.scrollDirection = UICollectionViewScrollDirectionVertical;
+    }
+    return self;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -37,14 +46,18 @@
 }
 #pragma mark - Collection view datasoure
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-    return self.sources.count;
+    return self.images.count;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-    return self.sources[section].images.count;
+    return self.images[section].count;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    return CGSizeMake((collectionView.frame.size.width - 3) / 4, (collectionView.frame.size.width - 3) / 4);
 }
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section{
-    return 10.f;
+    return 1.f;
 }
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section{
     return 1.0f;
@@ -52,61 +65,26 @@
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
     return UIEdgeInsetsZero;
 }
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
+    return CGSizeMake(collectionView.frame.size.width, 42);
+}
+
+
 
 #pragma mark - Collection view datasource
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     DisCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([DisCell class]) forIndexPath:indexPath];
-    cell.disView.image = self.sources[indexPath.section].images[indexPath.row];
+    cell.disView.image = self.images[indexPath.section][indexPath.row][@"image"];
     return cell;
 }
-
-
-
-
-
-
-
-- (void)setAssets:(NSArray<PHAsset *> *)assets{
-    if (_assets != assets) {
-        _assets = assets;
-    }
-    WS(weakSelf);
-    [_assets enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        PHAsset *asset = obj;
-        NSString *createDate = [asset.creationDate stringFromDateWithFormatter:@"yyyy-MM-dd"];
-        CLLocation *location = asset.location;
-        
-        [weakSelf.geo reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
-            NSString *countryName = placemarks.firstObject.country;
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"dateSr == %@",createDate];
-            NSArray *models = [weakSelf.sources filteredArrayUsingPredicate:predicate];
-            @try
-            {
-                if (!models.count) {
-                    NSMutableArray *array = [NSMutableArray arrayWithObject:weakSelf.images[idx]];
-                    CaModel *c_model = [CaModel shareWithDes:countryName images:array date:createDate];
-                    [weakSelf.sources addObject:c_model];
-                }
-                else{
-                    CaModel *c_model = weakSelf.sources[idx];
-                    [c_model.images addObject:weakSelf.images[idx]];
-                    [weakSelf.sources addObject:c_model];
-                }
-            }
-            @catch(NSException *e){
-                NSLog(@"%@",e.reason);
-            }
-            [weakSelf.collectionView reloadData];
-        }];
-    }];
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
+    DisResuableView *resuableView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:NSStringFromClass([DisResuableView class]) forIndexPath:indexPath];
+    NSString *date = self.images[indexPath.section][indexPath.row][@"createDate"] ? : @"";
+    NSString *country = self.images[indexPath.section][indexPath.row][@"country"] ? : @"";
+    resuableView.label.text = [NSString stringWithFormat:@"%@ %@",date,country];
+    return resuableView;
 }
 
-- (NSMutableArray<CaModel *> *)sources{
-    if (!_sources) {
-        _sources = [NSMutableArray array];
-    }
-    return _sources;
-}
 
 - (CLGeocoder *)geo{
     if (!_geo) {
@@ -180,6 +158,20 @@
         [self.contentView addSubview:_disView];
         _disView.backgroundColor = [UIColor groupTableViewBackgroundColor];
         [_disView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.edges.insets(UIEdgeInsetsZero);
+        }];
+        _disView.contentMode = UIViewContentModeScaleToFill;
+    }
+    return self;
+}
+@end
+
+@implementation DisResuableView
+- (instancetype)initWithFrame:(CGRect)frame{
+    if ([super initWithFrame:frame]) {
+        self.label = [UILabel new];
+        [self addSubview:_label];
+        [_label mas_makeConstraints:^(MASConstraintMaker *make) {
             make.edges.insets(UIEdgeInsetsZero);
         }];
     }

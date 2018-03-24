@@ -12,10 +12,18 @@
 #import <ZLPhotoBrowser/ZLPhotoBrowser.h>
 #import "ZLPhotoActionSheet.h"
 #import <Photos/Photos.h>
+#import "Category.h"
+#import <CoreLocation/CoreLocation.h>
 @interface ScanPhotowsVC ()
 @property (nonatomic, strong)NSMutableArray *imageSoures;
 
 @property (nonatomic, strong)NSMutableArray *images;
+
+@property (nonatomic, strong)NSMutableArray *dicts;
+
+@property (nonatomic, strong)NSMutableDictionary *resultDic;
+
+@property (nonatomic, strong)NSMutableArray *results;
 @end
 
 @implementation ScanPhotowsVC
@@ -28,8 +36,25 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.title = @"Select title";
     [self.tableView registerClass:[ScanPhotosCell class] forCellReuseIdentifier:NSStringFromClass([ScanPhotosCell class])];
-    
+    [self addObserver:self forKeyPath:@"resultDic" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+    if ([keyPath isEqual:@"resultDic"]) {
+        if (self.dicts.count == self.imageSoures.count) {
+            NSArray *dates = [self.dicts valueForKey:@"createDate"];
+            NSSet *dateSet = [NSSet setWithArray:dates];
+            NSMutableArray *resultArray = [NSMutableArray array];
+            [[dateSet allObjects] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"createDate == %@",obj];
+                NSArray *dArray = [self.dicts filteredArrayUsingPredicate:predicate];
+                [resultArray addObject:dArray];
+            }];
+            self.results = resultArray;
+        }
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -66,6 +91,7 @@
             [cell configureWithImageNamed:images.firstObject];
             [weakSelf.imageSoures addObjectsFromArray:assets];
             [weakSelf.images addObjectsFromArray:images];
+            [weakSelf onHandleDataWithImages:weakSelf.images assets:weakSelf.imageSoures];
         };
         return;
     }
@@ -75,10 +101,35 @@
     
     if (indexPath.row == 1) {
         DisplayPhotosVC *dVC = [[DisplayPhotosVC alloc] initWithCollectionViewLayout:[UICollectionViewFlowLayout new]];
-        dVC.images = self.images;
-        dVC.assets = self.imageSoures;
+        dVC.images = self.results;
         [self.navigationController pushViewController:dVC animated:true];
     }
+}
+
+- (void)onHandleDataWithImages:(NSArray<UIImage *> *)images assets:(NSArray <PHAsset *> *)assets{
+    [self.dicts removeAllObjects];
+    WS(weakSelf);
+    [assets enumerateObjectsUsingBlock:^(PHAsset * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIImage *image = images[idx];
+        NSString *createDate = [obj.creationDate stringFromDate];
+        CLLocation *location = obj.location;
+        CLGeocoder *grocoder = [CLGeocoder new];
+        __block NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        dict[@"createDate"] = createDate;
+        dict[@"image"] = image;
+        [grocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+            dict[@"country"] = placemarks.firstObject.country;
+            [weakSelf.dicts addObject:dict];
+            weakSelf.resultDic = dict;
+        }];
+    }];
+}
+
+- (NSMutableArray *)dicts{
+    if (!_dicts) {
+        _dicts = [NSMutableArray array];
+    }
+    return _dicts;
 }
 
 
