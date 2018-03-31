@@ -14,8 +14,10 @@ import CoreLocation
 class PhotosSelectVC: UITableViewController {
     var sources = Array<Array<PHAsset>>()
     var selectImages = Array<Array<UIImage>>()
+    
     var dicts = Array<Dictionary<String , Any>>()
-//    var
+    var allDict = [Array<Dictionary<String , Any>>]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -26,78 +28,87 @@ class PhotosSelectVC: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         tableView.register(PhtotsCell.self, forCellReuseIdentifier: NSStringFromClass(PhtotsCell.self))
         tableView.separatorStyle = .none
+        navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "Add Photo", style: .plain, target: self, action: #selector(didSelectAddAction))
         
-        someTestBlock { (text) in
-            
+        self.navigationItem.title = "Photos"
+    }
+    
+    @objc func didSelectAddAction(button : UIButton) {
+        let actionSheet = ZLPhotoActionSheet()
+        actionSheet.configuration.maxSelectCount = 100
+        actionSheet.configuration.allowTakePhotoInLibrary = false
+        actionSheet.showPhotoLibrary(withSender: self)
+        // 图片多选
+        actionSheet.selectImageBlock = {[weak self] images,assets,isOrgin in
+            if let weaskSelf = self{
+                if let images = images{
+                    weaskSelf.selectImages.append(images)
+                    weaskSelf.sources.append(assets)
+                    weaskSelf.chargeAssetsLocation(assets: assets, images: images)
+                    weaskSelf.tableView.reloadData()
+                }
+            }
         }
     }
     
-    func someTestBlock(mactFuction : (_ text : String) -> Void){
-        mactFuction("123")
-    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
+    
     // MARK: - Table view delegate
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard indexPath.section > 0 else {
-            return
-        }
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.itemSize = CGSize(width: (tableView.frame.size.width - 3) / 4, height: (tableView.frame.size.width - 3) / 4)
+        layout.minimumInteritemSpacing = 1
+        layout.minimumLineSpacing = 1
+
+        let displayVC : OnePhotosVC = OnePhotosVC(collectionViewLayout: layout)
+        
+        displayVC.sources = sortWithDateString(dicts: self.allDict[indexPath.section])
+        navigationController?.pushViewController(displayVC, animated: true)
+        
     }
     
-    func chargeAssetsLocation(assets : [PHAsset], images : [UIImage], completion: @escaping (_ dicts : Array<Dictionary<String, Any>>) -> Void){
-        
-        
-        DispatchQueue.global().async {
-            var dicts = Array<Dictionary<String, Any>>()
-            
-            for image in images{
-                dicts.append(["image" : image])
-            }
-            
-            for asset in assets{
-                
-                if let creationDate = asset.creationDate{
-                    let createDate = creationDate.dateFromString(dateStr: "YYYY-MM-dd")
-                    let idx = assets.index(of: asset)!
-                    dicts[idx]["creationDate"] = createDate
-                }
-                
-                if let location = asset.location {
-                    let geocoder = CLGeocoder()
-                    geocoder.reverseGeocodeLocation(location, completionHandler: { (placemarks, _) in
-                        if let placemark = placemarks?.first{
-                            if let country = placemark.country{
-                                let idx = assets.index(of: asset)!
-                                dicts[idx]["country"] = country
-                                completion(dicts)
-                            }
-                        }
-                    })
-                }
-                
-            }
-        }
-        
-    }
+    
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return indexPath.section == 0 ? 100 : view.frame.size.width
+        return view.frame.size.width
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30
     }
     
     // MARK: - Table view data source
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section < allDict.count{
+            let headerDicts = allDict[section]
+            let countrysDict = headerDicts.filter { (dict) -> Bool in
+                return dict["country"] != nil
+            }
+            let countryStrs = NSArray(array: countrysDict).value(forKey: "country") as! [String]
+            
+            let c_set = NSSet(array: countryStrs)
+            let country = (c_set.allObjects as NSArray).componentsJoined(by: ",")
+            
+            return country
+        }
+        return nil
+    }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         
-        return 2
+        return sources.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return section == 0 ? 1 : selectImages.count
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -105,48 +116,95 @@ class PhotosSelectVC: UITableViewController {
         
         
         // Configure the cell...
-        configureCell(cell, indexPath)
+        cell.configureCell(image: self.selectImages[indexPath.section].first)
       
         return cell
     }
     
-    func configureCell(_ cell : PhtotsCell, _ indexPath : IndexPath) {
-        cell.didSelctAddButton = { [weak self] button -> Void in
-            let actionSheet = ZLPhotoActionSheet()
-            actionSheet.configuration.maxSelectCount = 100
-            actionSheet.configuration.allowTakePhotoInLibrary = false
-            
-            if let weakSelf = self{
-                actionSheet.arrSelectedAssets = weakSelf.getAllImages()
-                actionSheet.showPhotoLibrary(withSender: weakSelf)
+    // MARK: Photos charge
+    
+    func chargeAssetsLocation(assets : [PHAsset], images : [UIImage]){
+        dicts = Array<Dictionary<String, Any>>()
+        for asset in assets{
+            let idx = assets.index(of: asset)
+            var dict = Dictionary<String, Any>()
+            dict["image"] = images[idx!]
+            if let createDate = asset.creationDate{
+                dict["createDate"] = createDate.dateFromString(dateStr: "YYYY-MM-dd")
             }
-            // 图片多选
-            actionSheet.selectImageBlock = {[weak self] images,assets,isOrgin in
-                if let weaskSelf = self{
-                    if let images = images{
-                        weaskSelf.selectImages.append(images)
-                        weaskSelf.sources.append(assets)
-                        
-                        // 图片处理事务
-                        weaskSelf.chargeAssetsLocation(assets: assets, images: images, completion: { [weak self] dicts in
-                            if let w_self = self{
-                                w_self.sortImagesWithDicts(dicts: dicts)
-                            }
-                        })
-                        
-                        weaskSelf.tableView.reloadData()
+            getLocationCountry(asset: asset, dict: dict, res: {[weak self] country in
+                if let w_self = self{
+                    if w_self.dicts.filter({ (dict_f) -> Bool in
+                        if let c = dict_f["country"]{
+                            return (c as! String) != country
+                        }
+                        return true
+                    }).count > 0
+                    {
+                        w_self.tableView.reloadData()
+                    }
+                    
+                    dict["country"] = country
+                    w_self.dicts.append(dict)
+                    w_self.setAllDicts()
+                }
+            })
+        }
+    }
+    
+    func setAllDicts(){
+        if allDict.count != sources.count{
+            allDict.append(dicts)
+        }
+        else
+        {
+            allDict[sources.count - 1] = dicts
+        }
+        
+    }
+    
+    func sortWithDateString(dicts : [Dictionary<String, Any>]) -> [[Dictionary<String, Any>]]{
+        var sorts = [[Dictionary<String, Any>]]()
+        let dates = NSArray(array: dicts).value(forKey: "createDate") as! [String]
+        let dateSet = NSSet(array: dates)
+        for dateStr in dateSet.allObjects{
+            let createDateStr = String(describing: dateStr)
+            let someArry =   dicts.filter({ (dict) -> Bool in
+                return (dict["createDate"] as! NSString).isEqual(to: createDateStr)
+            })
+            sorts.append(someArry)
+        }
+        return sorts
+    }
+    
+    func getLocationCountry(asset : PHAsset, dict : Dictionary<String, Any>,res: ((_ country : String) -> Void)?){
+        if let location = asset.location{
+            let geo = CLGeocoder()
+            geo.reverseGeocodeLocation(location, completionHandler: { (placemarks, error) in
+                if error == nil, let placemark = placemarks?.first{
+                    if let country = placemark.country{
+                        if let res = res{
+                            res(country)
+                        }
+                    }
+                    else
+                    {
+                        self.dicts.append(dict)
+                        self.setAllDicts()
                     }
                 }
-            }
+                else
+                {
+                    self.dicts.append(dict)
+                    self.setAllDicts()
+                }
+            })
         }
-        
-        guard indexPath.section > 0 else{
-            cell.congureCell(indexPath: indexPath, image: nil)
-            return
+        else
+        {
+            self.dicts.append(dict)
+            self.setAllDicts()
         }
-        
-        cell.congureCell(indexPath: indexPath, image: self.selectImages[indexPath.row].first)
-        
     }
     
     func getAllImages() -> NSMutableArray?{
@@ -160,7 +218,7 @@ class PhotosSelectVC: UITableViewController {
     }
     
     func sortImagesWithDicts(dicts : Array<Dictionary<String , Any>>){
-        
+        NSLog("dicts %@", dicts)
     }
 
 

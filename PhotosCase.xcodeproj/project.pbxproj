@@ -16,6 +16,7 @@
 		40CAC87E206E332200C0D5E4 /* PhotosCaseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CAC87D206E332200C0D5E4 /* PhotosCaseUITests.swift */; };
 		40CAC88D206E348500C0D5E4 /* PhtotsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CAC88B206E348500C0D5E4 /* PhtotsCell.swift */; };
 		40CAC88E206E348500C0D5E4 /* PhotosSelectVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CAC88C206E348500C0D5E4 /* PhotosSelectVC.swift */; };
+		6F3CD18F206FD6C800E2027F /* OnePhotosVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F3CD18E206FD6C800E2027F /* OnePhotosVC.swift */; };
 		B38B38343B325FBDAC3D16AB /* Pods_PhotosCase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FF3F90509EB8BB4A6AF7512 /* Pods_PhotosCase.framework */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		40CAC88B206E348500C0D5E4 /* PhtotsCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhtotsCell.swift; sourceTree = "<group>"; };
 		40CAC88C206E348500C0D5E4 /* PhotosSelectVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotosSelectVC.swift; sourceTree = "<group>"; };
 		5FF3F90509EB8BB4A6AF7512 /* Pods_PhotosCase.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotosCase.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F3CD18E206FD6C800E2027F /* OnePhotosVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnePhotosVC.swift; sourceTree = "<group>"; };
 		9E2F325A94733C1C1E87AD46 /* Pods-PhotosCase.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotosCase.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PhotosCase/Pods-PhotosCase.debug.xcconfig"; sourceTree = "<group>"; };
 		FA5A9AA691643E62379B1DD2 /* Pods-PhotosCase.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotosCase.release.xcconfig"; path = "Pods/Target Support Files/Pods-PhotosCase/Pods-PhotosCase.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +118,7 @@
 				40CAC864206E332100C0D5E4 /* Assets.xcassets */,
 				40CAC866206E332100C0D5E4 /* LaunchScreen.storyboard */,
 				40CAC869206E332100C0D5E4 /* Info.plist */,
+				6F3CD18E206FD6C800E2027F /* OnePhotosVC.swift */,
 			);
 			path = PhotosCase;
 			sourceTree = "<group>";
@@ -352,6 +355,7 @@
 			files = (
 				40CAC860206E332100C0D5E4 /* ViewController.swift in Sources */,
 				40CAC88E206E348500C0D5E4 /* PhotosSelectVC.swift in Sources */,
+				6F3CD18F206FD6C800E2027F /* OnePhotosVC.swift in Sources */,
 				40CAC88D206E348500C0D5E4 /* PhtotsCell.swift in Sources */,
 				40CAC85E206E332100C0D5E4 /* AppDelegate.swift in Sources */,
 			);
