@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import GooglePlaces
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -22,6 +22,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         let naviVC = UINavigationController(rootViewController: PhotosSelectVC())
         window?.rootViewController = naviVC
+        
+        // Google map resign
+        GMSPlacesClient.provideAPIKey(Constants.Google_Map_key)
+        
         
         return true
     }

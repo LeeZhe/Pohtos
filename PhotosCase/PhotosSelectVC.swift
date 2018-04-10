@@ -11,6 +11,10 @@ import ZLPhotoBrowser
 import Photos
 import CoreLocation
 
+
+struct Constants{
+    static let Google_Map_key = "AIzaSyChU_iKPiGgPHzNjL9lBi-QowV_sykVeow"
+}
 class PhotosSelectVC: UITableViewController {
     var sources = Array<Array<PHAsset>>()
     var selectImages = Array<Array<UIImage>>()
