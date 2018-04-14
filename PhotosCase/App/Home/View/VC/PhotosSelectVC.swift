@@ -10,10 +10,11 @@ import UIKit
 import ZLPhotoBrowser
 import Photos
 import CoreLocation
-
+import Alamofire
 
 struct Constants{
-    static let Google_Map_key = "AIzaSyChU_iKPiGgPHzNjL9lBi-QowV_sykVeow"
+    static let Google_Map_key = "AIzaSyBC4BWKboY6NhAg9qNzhuiZOolFpakrVgs"
+    static let Google_Map_Api = "https://maps.googleapis.com/maps/api/geocode/json"
 }
 class PhotosSelectVC: UITableViewController {
     var sources = Array<Array<PHAsset>>()
@@ -35,6 +36,25 @@ class PhotosSelectVC: UITableViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "Add Photo", style: .plain, target: self, action: #selector(didSelectAddAction))
         
         self.navigationItem.title = "Photos"
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Photos Analysis", style: .plain, target: self, action: #selector(didSelectAnalysis))
+    }
+    
+    @objc func didSelectAnalysis(){
+        let actionSheet = ZLPhotoActionSheet()
+        actionSheet.configuration.maxSelectCount = 1
+        actionSheet.showPhotoLibrary(withSender: self)
+        actionSheet.selectImageBlock = { images, assets, isOrgin in
+            if let location = assets.first?.location{
+                let parameters = ["latlng" : "\(location.coordinate.latitude),\(location.coordinate.longitude)","key" : Constants.Google_Map_key]
+
+                NetworkTools.requestData(type: .GET, URLString: Constants.Google_Map_Api, parameters:parameters, finishedCallback: { (result) in
+                    print("result",result)
+                })
+                
+            }
+            
+        }
     }
     
     @objc func didSelectAddAction(button : UIButton) {
@@ -282,4 +302,14 @@ extension(Date){
     }
 }
 
+extension (Dictionary){
+    func urlString() -> String{
+        let someA : [String] = self.compactMap({ (key, value) -> String in
+            
+            return "\(key)=\(value)"
+        })
+        
+        return someA.joined(separator: "&")
+    }
+}
 

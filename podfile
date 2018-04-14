@@ -11,5 +11,7 @@ pod 'ZLPhotoBrowser'
 pod 'GooglePlaces'
 pod 'GooglePlacePicker'
 pod 'GoogleMaps'
+pod 'Alamofire'
+pod 'YYModel'
 end
 
