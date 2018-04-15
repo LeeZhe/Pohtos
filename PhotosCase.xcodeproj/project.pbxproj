@@ -18,6 +18,13 @@
 		40CAC868206E332100C0D5E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40CAC866206E332100C0D5E4 /* LaunchScreen.storyboard */; };
 		40CAC873206E332200C0D5E4 /* PhotosCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CAC872206E332200C0D5E4 /* PhotosCaseTests.swift */; };
 		40CAC87E206E332200C0D5E4 /* PhotosCaseUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40CAC87D206E332200C0D5E4 /* PhotosCaseUITests.swift */; };
+		6FDF5AD32083529D00BF3BCF /* NSArray+Sudoku.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5AD12083529D00BF3BCF /* NSArray+Sudoku.m */; };
+		6FDF5AD5208352B500BF3BCF /* PCPhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5AD4208352B500BF3BCF /* PCPhotoManager.swift */; };
+		6FDF5AD9208359F800BF3BCF /* TravePhotoSelVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5AD8208359F800BF3BCF /* TravePhotoSelVC.swift */; };
+		6FDF5ADC20835F6900BF3BCF /* UIView+AD.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5ADB20835F6900BF3BCF /* UIView+AD.m */; };
+		6FDF5ADF20835FB900BF3BCF /* UIColor+additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5ADD20835FB800BF3BCF /* UIColor+additions.m */; };
+		6FDF5AE320836DEF00BF3BCF /* SuggestedTripVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5AE220836DEF00BF3BCF /* SuggestedTripVC.swift */; };
+		6FDF5AE520838BDA00BF3BCF /* MemoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FDF5AE420838BDA00BF3BCF /* MemoryModel.swift */; };
 		B38B38343B325FBDAC3D16AB /* Pods_PhotosCase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FF3F90509EB8BB4A6AF7512 /* Pods_PhotosCase.framework */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +64,17 @@
 		40CAC87D206E332200C0D5E4 /* PhotosCaseUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosCaseUITests.swift; sourceTree = "<group>"; };
 		40CAC87F206E332200C0D5E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5FF3F90509EB8BB4A6AF7512 /* Pods_PhotosCase.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotosCase.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FDF5ACF2083529C00BF3BCF /* PhotosCase-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PhotosCase-Bridging-Header.h"; sourceTree = "<group>"; };
+		6FDF5AD12083529D00BF3BCF /* NSArray+Sudoku.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Sudoku.m"; sourceTree = "<group>"; };
+		6FDF5AD22083529D00BF3BCF /* NSArray+Sudoku.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+Sudoku.h"; sourceTree = "<group>"; };
+		6FDF5AD4208352B500BF3BCF /* PCPhotoManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCPhotoManager.swift; sourceTree = "<group>"; };
+		6FDF5AD8208359F800BF3BCF /* TravePhotoSelVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TravePhotoSelVC.swift; sourceTree = "<group>"; };
+		6FDF5ADA20835F6900BF3BCF /* UIView+AD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+AD.h"; sourceTree = "<group>"; };
+		6FDF5ADB20835F6900BF3BCF /* UIView+AD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+AD.m"; sourceTree = "<group>"; };
+		6FDF5ADD20835FB800BF3BCF /* UIColor+additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+additions.m"; sourceTree = "<group>"; };
+		6FDF5ADE20835FB800BF3BCF /* UIColor+additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+additions.h"; sourceTree = "<group>"; };
+		6FDF5AE220836DEF00BF3BCF /* SuggestedTripVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestedTripVC.swift; sourceTree = "<group>"; };
+		6FDF5AE420838BDA00BF3BCF /* MemoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryModel.swift; sourceTree = "<group>"; };
 		9E2F325A94733C1C1E87AD46 /* Pods-PhotosCase.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotosCase.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PhotosCase/Pods-PhotosCase.debug.xcconfig"; sourceTree = "<group>"; };
 		FA5A9AA691643E62379B1DD2 /* Pods-PhotosCase.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotosCase.release.xcconfig"; path = "Pods/Target Support Files/Pods-PhotosCase/Pods-PhotosCase.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -109,6 +127,7 @@
 		4015C306207E2735005CEB48 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				6FDF5AD4208352B500BF3BCF /* PCPhotoManager.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -117,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				4015C317207E2763005CEB48 /* GooglePlace.swift */,
+				6FDF5AE420838BDA00BF3BCF /* MemoryModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -133,8 +153,10 @@
 		4015C309207E2735005CEB48 /* VC */ = {
 			isa = PBXGroup;
 			children = (
+				6FDF5AD8208359F800BF3BCF /* TravePhotoSelVC.swift */,
 				4015C30A207E2735005CEB48 /* OnePhotosVC.swift */,
 				4015C30B207E2735005CEB48 /* PhotosSelectVC.swift */,
+				6FDF5AE220836DEF00BF3BCF /* SuggestedTripVC.swift */,
 			);
 			path = VC;
 			sourceTree = "<group>";
@@ -158,6 +180,8 @@
 		4015C310207E2735005CEB48 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				6FDF5AD02083529D00BF3BCF /* Category */,
+				6FDF5ACE2083529C00BF3BCF /* Header */,
 				4015C311207E2735005CEB48 /* NetworkTools.swift */,
 			);
 			path = Utils;
@@ -223,6 +247,27 @@
 				FA5A9AA691643E62379B1DD2 /* Pods-PhotosCase.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		6FDF5ACE2083529C00BF3BCF /* Header */ = {
+			isa = PBXGroup;
+			children = (
+				6FDF5ACF2083529C00BF3BCF /* PhotosCase-Bridging-Header.h */,
+			);
+			path = Header;
+			sourceTree = "<group>";
+		};
+		6FDF5AD02083529D00BF3BCF /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				6FDF5ADE20835FB800BF3BCF /* UIColor+additions.h */,
+				6FDF5ADD20835FB800BF3BCF /* UIColor+additions.m */,
+				6FDF5ADA20835F6900BF3BCF /* UIView+AD.h */,
+				6FDF5ADB20835F6900BF3BCF /* UIView+AD.m */,
+				6FDF5AD22083529D00BF3BCF /* NSArray+Sudoku.h */,
+				6FDF5AD12083529D00BF3BCF /* NSArray+Sudoku.m */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 		A9789CD7657118FD8683F565 /* Frameworks */ = {
@@ -299,7 +344,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Kiddie;
 				TargetAttributes = {
 					40CAC859206E332100C0D5E4 = {
@@ -439,10 +484,17 @@
 			files = (
 				4015C315207E2735005CEB48 /* AppDelegate.swift in Sources */,
 				4015C312207E2735005CEB48 /* OnePhotosVC.swift in Sources */,
+				6FDF5AD9208359F800BF3BCF /* TravePhotoSelVC.swift in Sources */,
 				4015C318207E2763005CEB48 /* GooglePlace.swift in Sources */,
+				6FDF5ADF20835FB900BF3BCF /* UIColor+additions.m in Sources */,
+				6FDF5ADC20835F6900BF3BCF /* UIView+AD.m in Sources */,
 				4015C316207E2735005CEB48 /* NetworkTools.swift in Sources */,
+				6FDF5AD32083529D00BF3BCF /* NSArray+Sudoku.m in Sources */,
 				4015C314207E2735005CEB48 /* PhtotsCell.swift in Sources */,
 				4015C313207E2735005CEB48 /* PhotosSelectVC.swift in Sources */,
+				6FDF5AD5208352B500BF3BCF /* PCPhotoManager.swift in Sources */,
+				6FDF5AE320836DEF00BF3BCF /* SuggestedTripVC.swift in Sources */,
+				6FDF5AE520838BDA00BF3BCF /* MemoryModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +563,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -518,6 +571,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -568,6 +622,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -575,6 +630,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -618,6 +674,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = Cango.PhotosCase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/PhotosCase/Utils/Header/PhotosCase-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -635,6 +692,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Cango.PhotosCase;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/PhotosCase/Utils/Header/PhotosCase-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

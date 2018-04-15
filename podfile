@@ -13,5 +13,6 @@ pod 'GooglePlacePicker'
 pod 'GoogleMaps'
 pod 'Alamofire'
 pod 'YYModel'
+pod 'Masonry'
 end
 
