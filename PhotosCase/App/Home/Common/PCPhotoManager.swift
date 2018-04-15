@@ -18,18 +18,32 @@ class PCPhotoManager: ZLPhotoManager {
     var memories = [String: Array<PHAssetCollection>]()
     var memoryAssets = [String : Array<PHFetchResult<PHAsset>>]()
     open func getMoments(){
-        let momentAlbums = PHAssetCollection.fetchMoments(with: nil)
+        
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: true)]
+        
+        let momentAlbums = PHAssetCollection.fetchMoments(with: options)
         
         momentAlbums.enumerateObjects(options: .concurrent) { (object,
             idx,
             stop: UnsafeMutablePointer<ObjCBool>)  in
             
             if let location = object.approximateLocation{
+                
                 let geo = CLGeocoder()
                 geo.reverseGeocodeLocation(location, completionHandler: { (places, error) in
+                    
+
+                    if error != nil{
+                        print(object.localizedTitle ?? "has none localizedTitle")
+                        print(error?.localizedDescription)
+                    }
+                    
                     if let place = places?.first{
                         if place.country != nil && place.locality != nil{
-                            let key = [place.country! + place.locality!].joined(separator: " ")
+                            let key = place.country! + " " + place.locality!
+                            print(key)
+                            
                             
                             let assets = PHAsset.fetchKeyAssets(in: object, options: nil)
                             
@@ -51,13 +65,43 @@ class PCPhotoManager: ZLPhotoManager {
                             {
                                 self.memories[key]?.append(object)
                             }
-                        }
-                        else
+                        } else
                         {
-                            print("None place \(object.localizedLocationNames.joined(separator: " ") )")
+                            print(place.subLocality ?? "",place.administrativeArea ?? "",place.subAdministrativeArea ?? "",
+                                  place.areasOfInterest ?? "")
+                            /*
+                            let key = place.subAdministrativeArea ?? "" + " " + place.locality! ?? ""
+                            
+                            let assets = PHAsset.fetchKeyAssets(in: object, options: nil)
+                            
+                            if let assets = assets {
+                                if self.memoryAssets[key] == nil{
+                                    self.memoryAssets[key] = [assets]
+                                }
+                                else
+                                {
+                                    self.memoryAssets[key]?.append(assets)
+                                }
+                                
+                            }
+                            
+                            if self.memories[key] == nil{
+                                self.memories[key] = [object]
+                            }
+                            else
+                            {
+                                self.memories[key]?.append(object)
+                            }
+                         */
                         }
                     }
                 })
+            }
+            else{
+                if object.localizedLocationNames.count > 0{
+                    print(object.localizedLocationNames)
+                }
+//                if let
             }
             /*
              else

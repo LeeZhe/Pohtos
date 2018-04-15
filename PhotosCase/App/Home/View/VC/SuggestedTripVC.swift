@@ -27,6 +27,7 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         collectionView?.backgroundColor = UIColor.groupTableViewBackground
         collectionView?.delegate = self
         collectionView?.dataSource = self
+        
         var maxKey = PCPhotoManager.defaultManager.memoryAssets.keys.first
         var count = 0
         for (key , value) in PCPhotoManager.defaultManager.memoryAssets{
