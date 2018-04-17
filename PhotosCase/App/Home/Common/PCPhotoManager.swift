@@ -18,7 +18,7 @@ class PCPhotoManager: ZLPhotoManager {
     var memories = [String: Array<PHAssetCollection>]()
     var memoryAssets = [String : Array<PHFetchResult<PHAsset>>]()
     open func getMoments(){
-        
+        print("123")
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "startDate", ascending: true)]
         
