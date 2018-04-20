@@ -28,97 +28,40 @@ class PCPhotoManager: ZLPhotoManager {
             idx,
             stop: UnsafeMutablePointer<ObjCBool>)  in
             
-            if let location = object.approximateLocation{
-                
-                let geo = CLGeocoder()
-                geo.reverseGeocodeLocation(location, completionHandler: { (places, error) in
-                    
-
-                    if error != nil{
-                        print(object.localizedTitle ?? "has none localizedTitle")
-                        print(error?.localizedDescription)
-                    }
-                    
-                    if let place = places?.first{
-                        if place.country != nil && place.locality != nil{
-                            let key = place.country! + " " + place.locality!
-                            print(key)
-                            
-                            
-                            let assets = PHAsset.fetchKeyAssets(in: object, options: nil)
-                            
-                            if let assets = assets {
-                                if self.memoryAssets[key] == nil{
-                                    self.memoryAssets[key] = [assets]
-                                }
-                                else
-                                {
-                                    self.memoryAssets[key]?.append(assets)
-                                }
-
-                            }
-                            
-                            if self.memories[key] == nil{
-                                self.memories[key] = [object]
-                            }
-                            else
-                            {
-                                self.memories[key]?.append(object)
-                            }
-                        } else
-                        {
-                            print(place.subLocality ?? "",place.administrativeArea ?? "",place.subAdministrativeArea ?? "",
-                                  place.areasOfInterest ?? "")
-                            /*
-                            let key = place.subAdministrativeArea ?? "" + " " + place.locality! ?? ""
-                            
-                            let assets = PHAsset.fetchKeyAssets(in: object, options: nil)
-                            
-                            if let assets = assets {
-                                if self.memoryAssets[key] == nil{
-                                    self.memoryAssets[key] = [assets]
-                                }
-                                else
-                                {
-                                    self.memoryAssets[key]?.append(assets)
-                                }
-                                
-                            }
-                            
-                            if self.memories[key] == nil{
-                                self.memories[key] = [object]
-                            }
-                            else
-                            {
-                                self.memories[key]?.append(object)
-                            }
-                         */
-                        }
-                    }
-                })
-            }
-            else{
-                if object.localizedLocationNames.count > 0{
-                    print(object.localizedLocationNames)
+            // Find the moment where has title
+            if let place = object.localizedTitle?.split(separator: " ").first{
+                let placeStr = String(place)
+                if let _ = self.memories[placeStr]{
+                    self.memories[placeStr]?.append(object)
                 }
-//                if let
+                else
+                {
+                    self.memories[placeStr] = [object]
+                }
             }
-            /*
-             else
-             {
-             print("has none location",object.localizedTitle ?? "",object.startDate?.dateFromString(dateStr: "YYYY-MM-dd"))
-             let assets = PHAsset.fetchAssets(in: object, options: nil)
-             assets.enumerateObjects({ (asset, idx, stop: UnsafeMutablePointer<ObjCBool>) in
-             if let location = asset.location{
-             print("None location has asset location")
-             }
-             })
-             }
-             
-             }
-             
-             }
-             */
         }
-    }       
+        
+        // The max count of the array is place of residence
+    }
+    
+    private func choosePlaceOfResidence(){
+        var maxCount = 0
+        var maxKey = memories.keys.first
+        for (key , collections) in memories{
+            if collections.count > maxCount{
+                maxCount = collections.count
+                maxKey = key
+            }
+        }
+        memories[maxKey!] =  nil
+    }
+    
+    private func organizeTravel(){
+        for (key , collections) in memories{
+            for collection in collections{
+                
+            }
+        }
+    }
+ 
 }
