@@ -14,12 +14,12 @@ class TravePhotoSelVC: UIViewController {
         super.viewDidLoad()
         
         
-        let headerView = HeaderView(frame: CGRect(x: 0, y: (navigationController?.navigationBar.height)! + UIApplication.shared.statusBarFrame.size.height, width: view.width, height: 60))
+        let headerView = HeaderView(frame: CGRect(x: 0, y: (navigationController?.navigationBar.height)! + UIApplication.shared.statusBarFrame.size.height, width: view.width, height: 40))
         view.addSubview(headerView)
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let suggestedChildVC = SuggestedTripVC(collectionViewLayout: layout)
-        suggestedChildVC.view?.frame = CGRect(x: 0, y: (navigationController?.navigationBar.height)! + UIApplication.shared.statusBarFrame.size.height + 60, width: view.width, height: (view.width - 15 * 5) / 2 + 60)
+        suggestedChildVC.view?.frame = CGRect(x: 0, y: (navigationController?.navigationBar.height)! + UIApplication.shared.statusBarFrame.size.height + headerView.height, width: view.width, height: (view.width - 15 * 5) / 2 + 60)
         view.addSubview(suggestedChildVC.view)
         addChildViewController(suggestedChildVC)
         // Do any additional setup after loading the view.

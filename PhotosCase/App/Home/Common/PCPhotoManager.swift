@@ -17,6 +17,9 @@ class PCPhotoManager: ZLPhotoManager {
     
     var memories = [String: Array<PHAssetCollection>]()
     var memoryAssets = [String : Array<PHFetchResult<PHAsset>>]()
+    var allCollections = [PHAssetCollection]()
+    var residence : String!
+    var traves = [[PHAssetCollection]]()
     open func getMoments(){
         
         let options = PHFetchOptions()
@@ -38,10 +41,14 @@ class PCPhotoManager: ZLPhotoManager {
                 {
                     self.memories[placeStr] = [object]
                 }
+                self.allCollections.append(object)
             }
+            
         }
         
         // The max count of the array is place of residence
+        choosePlaceOfResidence()
+        organizeTravel()
     }
     
     private func choosePlaceOfResidence(){
@@ -53,14 +60,55 @@ class PCPhotoManager: ZLPhotoManager {
                 maxKey = key
             }
         }
-        memories[maxKey!] =  nil
+        if let maxKey = maxKey{
+            memories[maxKey] =  nil
+            self.residence = maxKey
+        }
+        
+//        memories.removeAll()
     }
     
     private func organizeTravel(){
-        for (key , collections) in memories{
-            for collection in collections{
+       self.allCollections = self.allCollections.filter { (collection) -> Bool in
+        if let place = collection.localizedTitle?.split(separator: " ").first{
+                return place != self.residence
+            }
+            return true
+        }
+        var  collections = Array(allCollections)
+        for collection in self.allCollections{
+            if let startDate = collection.startDate{
+                let theOneTraves = collections.filter { (c_model) -> Bool in
+                    
+                    if let c_starDate = c_model.startDate{
+                        return abs(Int32(c_starDate.timeIntervalSince(startDate))) <= 5 * 86400
+                    }
+                    
+                    return false
+                }
+                
+                for place in theOneTraves{
+                   let idx = collections.index(of: place)
+                    if idx != nil{
+                        collections.remove(at: idx!)
+                    }
+                }
+                
+                if theOneTraves.count > 0{
+                    traves.append(theOneTraves)
+                }
                 
             }
+        }
+        // print the organized trave
+        for trave in traves{
+            let array = NSArray(array: trave)
+            print(array.value(forKey: "localizedTitle"))
+            print(array.value(forKey: "startDate"))
+        }
+        
+        if traves.count > 7{
+            traves.removeSubrange(traves.count - 7..<traves.count - 1)
         }
     }
  

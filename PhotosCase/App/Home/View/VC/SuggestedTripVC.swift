@@ -9,10 +9,11 @@
 import UIKit
 
 private let reuseIdentifier = "Cell"
-var memories : [String : Array<PHAssetCollection>]?
-var sources = [MemoryModel]()
-class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLayout {
 
+class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLayout {
+    var memories : [String : Array<PHAssetCollection>]?
+    var sources = [MemoryModel]()
+    var traves = [[PHAssetCollection]]()
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -23,30 +24,60 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         
         collectionView?.showsHorizontalScrollIndicator = false
         // Do any additional setup after loading the view.
-        self.collectionView!.register(SuggestedTripCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView?.register(SuggestedTripCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         collectionView?.backgroundColor = UIColor.groupTableViewBackground
         collectionView?.delegate = self
         collectionView?.dataSource = self
         
-        var maxKey = PCPhotoManager.defaultManager.memoryAssets.keys.first
-        var count = 0
-        for (key , value) in PCPhotoManager.defaultManager.memoryAssets{
-            if value.count > count{
-                count = value.count
-                maxKey = key
-            }
-        }
+//        collectionView?.register(ReuseHeaderView.self , forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView")
+        traves = PCPhotoManager.defaultManager.traves
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         
-        PCPhotoManager.defaultManager.memoryAssets[maxKey!] = nil
-        // Display lastest photos
-        for (key, value) in PCPhotoManager.defaultManager.memoryAssets.enumerated().reversed(){
+        for trave in traves{
+            
+            let m_model = MemoryModel()
+            
+            m_model.startDate = trave.first?.startDate
+            m_model.endDate = trave.last?.endDate
+            
+            for collection in  trave{
+                print(collection.localizedTitle ?? "")
+                
+                if let localizedTitle = collection.localizedTitle{
+                    if m_model.places.contains(localizedTitle) == false{
+                        m_model.places.append(localizedTitle.split(separator: "-").joined())
+                    }
+                }
+                
+                var assets = [PHAsset]()
+                let results = PHAsset.fetchAssets(in: collection, options: options)
+                results.enumerateObjects { (asset, idx, _) in
+                    m_model.allAssets.append(asset)
+                    assets.append(asset)
+                }
+                m_model.theOneAssets.append(assets)
+                
+            }
+            
+            // random asset in the one assets and filter the count < 4
+            if m_model.allAssets.count > 4{
+                
+//                m_model.displayAssets = m_model.allAssets
+                for idx in 0 ..< 4{
+                    m_model.displayAssets.append(m_model.allAssets[idx])
+                }
+                
+                ZLPhotoManager.anialysisAssets(m_model.displayAssets, original: false) { (images) in
+                    if let images = images{
+                        self.sources.append(m_model)
+                        m_model.displayImages = images
+                        self.collectionView?.reloadData()
+                    }
+                }
+            }
             
         }
-        
-        
-        
-        
-//        collectionView?.register(ReuseHeaderView.self , forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView")
     }
 
     override func didReceiveMemoryWarning() {
@@ -74,12 +105,13 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of items
-        return memories?.count ?? 0
+        return self.sources.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-    
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! SuggestedTripCell
+        
+        cell.configureCell(m_model: self.sources[indexPath.row])
         // Configure the cell
         return cell
     }
@@ -92,7 +124,7 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (collectionView.width - 15 * 5) / 2, height:(collectionView.width - 15 * 5) / 2)
+        return CGSize(width: (collectionView.width - 15 * 5) / 2, height:(collectionView.width - 15 * 5) / 2 + 30)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -139,8 +171,12 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
 class SuggestedTripCell: UICollectionViewCell {
     var imgs = [UIImageView]()
     
-    fileprivate let imageManager = PHCachingImageManager()
-    fileprivate var thumbnailSize: CGSize!
+    var label = UILabel()
+    var timeLb = UILabel()
+    var picNo = UILabel()
+//    var cacheImages = [UIImage]()
+//    fileprivate let imageManager = PHCachingImageManager()
+//    fileprivate var thumbnailSize: CGSize!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -151,39 +187,89 @@ class SuggestedTripCell: UICollectionViewCell {
         contrainView.layer.masksToBounds = true;
         contentView.addSubview(contrainView)
         
-        for x in [0,1,2,4]{
+        for _ in 0..<4{
             let img = UIImageView()
             imgs.append(img)
             img.clipsToBounds = true
             img.contentMode = .scaleAspectFill
-            img.backgroundColor = UIColor.red
+//            img.backgroundColor = UIColor.red
             
 //            let maskPath = UIBezierPath.init(roundedRect: <#T##CGRect#>, byRoundingCorners: <#T##UIRectCorner#>, cornerRadii: <#T##CGSize#>)
             
             contrainView.addSubview(img)
         }
         contrainView.snp.makeConstraints { (make) in
-            make.edges.equalTo(contentView)
+            make.edges.equalTo(UIEdgeInsetsMake(0, 0, 30, 0));
         }
         
         NSArray(array: contrainView.subviews).mas_distributeSudokuViews(withFixedLineSpacing: 1, fixedInteritemSpacing: 1, warpCount: 2, topSpacing: 0, bottomSpacing: 0, leadSpacing: 0, tailSpacing: 0)
+        
+//        let titleView = UIView()
+//        titleView.backgroundColor = UIColor.init(white: 0, alpha: 0.3)
+//        titleView.layer.cornerRadius = 5.0
+//        contentView.addSubview(titleView)
+//        titleView.snp.makeConstraints { (make) in
+//            make.edges.equalTo(UIEdgeInsetsMake(50, 15, 50, 15));
+//        }
+        
+        contrainView.addSubview(label)
+        label.layer.cornerRadius = 5
+        label.layer.masksToBounds = true;
+        label.textColor = UIColor.white
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 15)
+        label.numberOfLines = 2
+        label.lineBreakMode = .byClipping
+        label.backgroundColor = UIColor.init(white: 0, alpha: 0.6)
+        self.label.snp.makeConstraints { (make) in
+            make.edges.equalTo(UIEdgeInsetsMake(30, 12, 30, 12));
+        }
+        
+        addSubview(timeLb)
+        timeLb.font = UIFont.systemFont(ofSize: 14)
+        timeLb.textColor = UIColor.gray
+        timeLb.snp.makeConstraints { (make) in
+            make.left.equalTo(self.contentView)
+            make.bottom.equalTo(self.contentView)
+            make.height.equalTo(17)
+
+        }
+        
+                addSubview(picNo)
+        picNo.textColor = UIColor.gray
+        picNo.font = timeLb.font
+        picNo.snp.makeConstraints { (make) in
+            make.right.equalTo(self.contentView)
+            make.bottom.equalTo(self.timeLb)
+            make.height.equalTo(17)
+        }
+        
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        thumbnailSize = imgs.first?.frame.size
+//        thumbnailSize = imgs.first?.frame.size
     }
     
-    open func configureCell(assets : [PHAsset]){
-        guard assets.count > 3 else {
-            return;
+    open func configureCell(m_model : MemoryModel){
+        guard  m_model.displayImages.count > 3 else {
+            return
         }
-        for img in imgs{
-            let idx = imgs.index(of: img)
-            imageManager.requestImage(for: assets[idx!], targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { (image, _) in
-                    img.image = image
-            })
+        for (idx , imageView) in self.imgs.enumerated(){
+            imageView.image = m_model.displayImages[idx]
         }
+        
+        if m_model.places.count > 2 {
+            self.label.text = m_model.places[0..<2].joined(separator: "\n")
+        }
+        else
+        {
+            self.label.text = m_model.places.joined(separator: "\n")
+        }
+        
+        self.timeLb.text = m_model.startDate?.dateFromString(dateStr: "MM-dd,yyyy")
+        self.picNo.text = "No." + String(m_model.allAssets.count)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -9,7 +9,20 @@
 import UIKit
 
 class MemoryModel: NSObject {
-    @objc var createDate : String?
-    @objc var place : String?
+//    @objc var createDate : String?
+    @objc var places = [String]()
     @objc var images : [UIImage]?
+    @objc var theOneAssets = [[PHAsset]]()
+    @objc var allAssets = [PHAsset]()
+    @objc var startDate : Date?
+    @objc var endDate : Date?
+    @objc var displayAssets = [PHAsset]()
+    @objc var displayImages = [UIImage]()
+    
+    
+    func randomCustom(min: Int, max: Int) -> Int {
+        let y = arc4random() % UInt32(max) + UInt32(min)
+        print(Int(y))
+        return Int(y)
+    }
 }
