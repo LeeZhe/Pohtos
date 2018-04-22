@@ -108,7 +108,7 @@ class PCPhotoManager: ZLPhotoManager {
         }
         
         if traves.count > 7{
-            traves.removeSubrange(traves.count - 7..<traves.count - 1)
+            traves.removeSubrange(0..<traves.count - 7)
         }
     }
  
