@@ -194,7 +194,7 @@ class PCPhotoManager: ZLPhotoManager {
             print(array.value(forKey: "localizedTitle"))
             print(array.value(forKey: "startDate"))
         }
-
+        UIAlertView.init(title: nil, message: "you can look the trave", delegate: nil, cancelButtonTitle: "Good").show()
     }
     
     public func dispathTimer(timeInterval : Double, repeatCount: Int, handler:@escaping (DispatchSourceTimer?, Int)->(), handlerCancle:@escaping() -> ())
