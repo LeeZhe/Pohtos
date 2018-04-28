@@ -103,7 +103,7 @@ class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegat
         }
         else
         {
-            header.label.text = m_model.theOneAssets[indexPath.section].first?.localIdentifier
+            header.label.text = m_model.theOneAssets[indexPath.section].first?.creationDate?.dateFromString(dateStr: "dd-MM")
         }
         
 //        if let date = headerDicts[indexPath.row]["createDate"]{
