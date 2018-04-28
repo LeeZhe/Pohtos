@@ -45,6 +45,10 @@ class PCPhotoManager: ZLPhotoManager {
             idx,
             stop: UnsafeMutablePointer<ObjCBool>)  in
             
+            if let localTitle = object.localizedTitle{
+                print("localTitle \(localTitle)")
+            }
+            
             // Find the moment where has location
             if let _ = object.approximateLocation{
                 self.allCollections.append(object)
@@ -52,76 +56,76 @@ class PCPhotoManager: ZLPhotoManager {
             
         }
         
-        let geo = CLGeocoder()
-        dispathTimer(timeInterval: 0.15, repeatCount: self.allCollections.count, handler: { (_, idx) in
-            let moment = self.allCollections[idx]
-            
-            if let startDate = moment.startDate{
-                let dateStr = startDate.dateFromString(dateStr: "YYYY-MM-dd")
-                if let key = self.datePlace[dateStr]{
-                    print("cache has key \(key)")
-                    if self.memories[key] == nil{
-                        self.memories[key] = [moment]
-                    }
-                    else
-                    {
-                        self.memories[key]?.append(moment)
-                    }
-                }
-                else
-                {
-                    
-                    if let place = moment.approximateLocation{
-                        geo.reverseGeocodeLocation(place, completionHandler: { (places, error) in
-                            if error == nil{
-                                var key = ""
-                                if let city = places?.first?.locality{
-                                    key = "\(places?.first?.country ?? "") \(city)"
-                                }
-                                else
-                                {
-                                    if let administrativeArea = places?.first?.administrativeArea{
-                                        key = "\(places?.first?.country ?? "") \(administrativeArea)"
-                                    }
-                                }
-                                
-                                if let startDate = moment.startDate{
-                                    print("None cache key \(key)")
-                                    self.datePlace[startDate.dateFromString(dateStr: "YYYY-MM-dd")] = key
-                                }
-                                
-                                if self.memories[key] == nil{
-                                    self.memories[key] = [moment]
-                                }
-                                else
-                                {
-                                    self.memories[key]?.append(moment)
-                                }
-                            }
-                            else
-                            {
-                                print(error?.localizedDescription ?? "None locatication")
-                                
-                            }
-                            
-                        })
-                    }
-                    
-                    
-                }
-                
-            }
-            
-        }) {
-            if NSDictionary(dictionary: self.datePlace).write(toFile: "\(self.filePath)/place.plst", atomically: true){
-                print("write to file success")
-            }
-            self.choosePlaceOfResidence()
-            self.organizeTravel()
-        }
-        
-        // The max count of the array is place of residence
-//        choosePlaceOfResidence()
+//        let geo = CLGeocoder()
+//        dispathTimer(timeInterval: 0.15, repeatCount: self.allCollections.count, handler: { (_, idx) in
+//            let moment = self.allCollections[idx]
+//
+//            if let startDate = moment.startDate{
+//                let dateStr = startDate.dateFromString(dateStr: "YYYY-MM-dd")
+//                if let key = self.datePlace[dateStr]{
+//                    print("cache has key \(key)")
+//                    if self.memories[key] == nil{
+//                        self.memories[key] = [moment]
+//                    }
+//                    else
+//                    {
+//                        self.memories[key]?.append(moment)
+//                    }
+//                }
+//                else
+//                {
+//
+//                    if let place = moment.approximateLocation{
+//                        geo.reverseGeocodeLocation(place, completionHandler: { (places, error) in
+//                            if error == nil{
+//                                var key = ""
+//                                if let city = places?.first?.locality{
+//                                    key = "\(places?.first?.country ?? "") \(city)"
+//                                }
+//                                else
+//                                {
+//                                    if let administrativeArea = places?.first?.administrativeArea{
+//                                        key = "\(places?.first?.country ?? "") \(administrativeArea)"
+//                                    }
+//                                }
+//
+//                                if let startDate = moment.startDate{
+//                                    print("None cache key \(key)")
+//                                    self.datePlace[startDate.dateFromString(dateStr: "YYYY-MM-dd")] = key
+//                                }
+//
+//                                if self.memories[key] == nil{
+//                                    self.memories[key] = [moment]
+//                                }
+//                                else
+//                                {
+//                                    self.memories[key]?.append(moment)
+//                                }
+//                            }
+//                            else
+//                            {
+//                                print(error?.localizedDescription ?? "None locatication")
+//
+//                            }
+//
+//                        })
+//                    }
+//
+//
+//                }
+//
+//            }
+//
+//        }) {
+//            if NSDictionary(dictionary: self.datePlace).write(toFile: "\(self.filePath)/place.plst", atomically: true){
+//                print("write to file success")
+//            }
+//            self.choosePlaceOfResidence()
+//            self.organizeTravel()
+//        }
+//
+//        // The max count of the array is place of residence
+////        choosePlaceOfResidence()
 
     }
     
