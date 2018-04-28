@@ -102,6 +102,17 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         // Pass the selected object to the new view controller.
     }
     */
+    
+   override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+            let layout = UICollectionViewFlowLayout()
+            layout.scrollDirection = .vertical
+        layout.itemSize = CGSize(width: (collectionView.frame.size.width - 3) / 4, height: (collectionView.frame.size.width - 3) / 4)
+            layout.minimumInteritemSpacing = 1
+            layout.minimumLineSpacing = 1
+            let sugVC = SuggestedsTripImagesVC(collectionViewLayout: layout)
+            sugVC.m_model = self.sources[indexPath.row]
+            navigationController?.pushViewController(sugVC, animated: true)
+    }
 
     // MARK: UICollectionViewDataSource
 
