@@ -14,7 +14,8 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
     var memories : [String : Array<PHAssetCollection>]?
     var sources = [MemoryModel]()
     var traves = [[PHAssetCollection]]()
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
 
         // Uncomment the following line to preserve selection between presentations
@@ -34,7 +35,9 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         
-        for trave in traves{
+        for trave in traves
+        {
+            
             
             let m_model = MemoryModel()
             
@@ -48,6 +51,10 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
                     if m_model.places.contains(localizedTitle) == false{
                         m_model.places.append(localizedTitle.split(separator: "-").joined())
                     }
+                }
+                
+                if collection.localizedLocationNames.count > 0{
+                    m_model.localizedLocationNames.append(collection.localizedLocationNames)
                 }
                 
                 var assets = [PHAsset]()
@@ -78,6 +85,7 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
             }
             
         }
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -265,6 +273,10 @@ class SuggestedTripCell: UICollectionViewCell {
         else
         {
             self.label.text = m_model.places.joined(separator: "\n")
+        }
+        
+        if self.label.text?.count == nil{
+            self.label.text = m_model.localizedLocationNames.first?.joined(separator: ",")
         }
         
         self.timeLb.text = m_model.startDate?.dateFromString(dateStr: "MM-dd,yyyy")

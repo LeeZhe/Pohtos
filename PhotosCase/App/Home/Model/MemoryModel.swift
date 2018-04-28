@@ -12,6 +12,7 @@ class MemoryModel: NSObject {
 //    @objc var createDate : String?
     @objc var places = [String]()
     @objc var images : [UIImage]?
+    @objc var localizedLocationNames = [[String]]()
     @objc var theOneAssets = [[PHAsset]]()
     @objc var allAssets = [PHAsset]()
     @objc var startDate : Date?
