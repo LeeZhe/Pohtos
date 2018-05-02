@@ -10,30 +10,17 @@ import UIKit
 import ZLPhotoBrowser
 class PCPhotoManager: ZLPhotoManager {
     static let defaultManager = PCPhotoManager()
-    var filePath = ""
+    
     private override init() {
         super.init()
-        let path = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first
-        let cacheDirection = path! + "/Kiddie/\(Bundle.main.bundleIdentifier ?? "")"
-        filePath = cacheDirection
-        if !FileManager.default.fileExists(atPath: cacheDirection){
-            try? FileManager.default.createDirectory(atPath: cacheDirection, withIntermediateDirectories: true, attributes: nil)
-        }
-        else
-        {
-            if FileManager.default.fileExists(atPath: filePath + "/place.plist"){
-                self.datePlace = NSDictionary.init(contentsOfFile: "\(filePath)/place.plist") as! [String : String]
-                
-            }
-        }
-        
     }
     
     var memories = [String: Array<PHAssetCollection>]()
+    var memoryAssets = [String : Array<PHFetchResult<PHAsset>>]()
     var allCollections = [PHAssetCollection]()
     var residence : String!
+    var localLacation : CLLocation!
     var traves = [[PHAssetCollection]]()
-    var datePlace = [String : String]()
     open func getMoments(){
         
         let options = PHFetchOptions()
@@ -45,88 +32,26 @@ class PCPhotoManager: ZLPhotoManager {
             idx,
             stop: UnsafeMutablePointer<ObjCBool>)  in
             
-            if let localTitle = object.localizedTitle{
-                print("localTitle \(localTitle)")
-            }
-            
-            // Find the moment where has location
-            if let _ = object.approximateLocation{
+            // Find the moment where has title
+            if let place = object.localizedTitle{
+//                print(place)
+//                print("startDate: \(object.startDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
+//                print("endDate: \(object.endDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
+                if let _ = self.memories[place]{
+                    self.memories[place]?.append(object)
+                }
+                else
+                {
+                    self.memories[place] = [object]
+                }
                 self.allCollections.append(object)
             }
             
         }
         
-//        let geo = CLGeocoder()
-//        dispathTimer(timeInterval: 0.15, repeatCount: self.allCollections.count, handler: { (_, idx) in
-//            let moment = self.allCollections[idx]
-//
-//            if let startDate = moment.startDate{
-//                let dateStr = startDate.dateFromString(dateStr: "YYYY-MM-dd")
-//                if let key = self.datePlace[dateStr]{
-//                    print("cache has key \(key)")
-//                    if self.memories[key] == nil{
-//                        self.memories[key] = [moment]
-//                    }
-//                    else
-//                    {
-//                        self.memories[key]?.append(moment)
-//                    }
-//                }
-//                else
-//                {
-//
-//                    if let place = moment.approximateLocation{
-//                        geo.reverseGeocodeLocation(place, completionHandler: { (places, error) in
-//                            if error == nil{
-//                                var key = ""
-//                                if let city = places?.first?.locality{
-//                                    key = "\(places?.first?.country ?? "") \(city)"
-//                                }
-//                                else
-//                                {
-//                                    if let administrativeArea = places?.first?.administrativeArea{
-//                                        key = "\(places?.first?.country ?? "") \(administrativeArea)"
-//                                    }
-//                                }
-//
-//                                if let startDate = moment.startDate{
-//                                    print("None cache key \(key)")
-//                                    self.datePlace[startDate.dateFromString(dateStr: "YYYY-MM-dd")] = key
-//                                }
-//
-//                                if self.memories[key] == nil{
-//                                    self.memories[key] = [moment]
-//                                }
-//                                else
-//                                {
-//                                    self.memories[key]?.append(moment)
-//                                }
-//                            }
-//                            else
-//                            {
-//                                print(error?.localizedDescription ?? "None locatication")
-//
-//                            }
-//
-//                        })
-//                    }
-//
-//
-//                }
-//
-//            }
-//
-//        }) {
-//            if NSDictionary(dictionary: self.datePlace).write(toFile: "\(self.filePath)/place.plst", atomically: true){
-//                print("write to file success")
-//            }
-//            self.choosePlaceOfResidence()
-//            self.organizeTravel()
-//        }
-//
-//        // The max count of the array is place of residence
-////        choosePlaceOfResidence()
-
+        // The max count of the array is place of residence
+        choosePlaceOfResidence()
+        organizeTravel()
     }
     
     private func choosePlaceOfResidence(){
@@ -139,91 +64,97 @@ class PCPhotoManager: ZLPhotoManager {
             }
         }
         if let maxKey = maxKey{
-            memories[maxKey] =  nil
             self.residence = maxKey
+            for collection in memories[maxKey]!{
+                if let location = collection.approximateLocation{
+                    self.localLacation = location
+                }
+            }
+            memories[maxKey] =  nil
         }
     }
     
     private func organizeTravel(){
-       self.allCollections = self.allCollections.filter { (collection) -> Bool in
-        if let starDate = collection.startDate?.dateFromString(dateStr: "YYYY-MM-dd"){
-            if let placeCache = self.datePlace[starDate], placeCache == self.residence{
-                    return false
+        var placeMoments = [String : [PHAssetCollection]]()
+        for (key,collections) in memories{
+            guard collections.count <= 10 , collections.count > 0 else{
+                continue
             }
             
-            if let place = collection.localizedTitle, let city = self.residence.components(separatedBy:" ").last{
-                return !place.contains(city)
+            placeMoments[key] = collections
+        }
+        
+        
+        
+        // Filter the date continuous
+        placeMoments = placeMoments.filter { (arg) -> Bool in
+            
+            let (_, collections) = arg
+            let isSec = abs(Int32((collections.first?.startDate?.timeIntervalSince((collections.last?.startDate)!))!)) < 8 * 24 * 3600
+            
+            return isSec
+        }
+        var allValues = [PHAssetCollection]()
+        var tempValues = [PHAssetCollection]()
+        for collections in placeMoments.values{
+            for collection in collections{
+                allValues.append(collection)
+                tempValues.append(collection)
             }
         }
-            return true
-        }
-        var  collections = Array(allCollections)
-        for collection in self.allCollections{
-            if let startDate = collection.startDate{
-                let theOneTraves = collections.filter { (c_model) -> Bool in
-                    
-                    if let c_starDate = c_model.startDate{
-                        return abs(Int32(c_starDate.timeIntervalSince(startDate))) <= 5 * 86400
-                    }
-                    
-                    return false
+        
+//        for collection in 
+        
+        
+        
+        
+        for (_, collections) in placeMoments{
+            
+            for collection in collections{
+                if let location = collection.approximateLocation{
+                    collection.distanceResicence = location.distance(from: self.localLacation)
                 }
-                
-                for place in theOneTraves{
-                   let idx = collections.index(of: place)
-                    if idx != nil{
-                        collections.remove(at: idx!)
-                    }
-                }
-                
-                if theOneTraves.count > 0{
-                    traves.append(theOneTraves)
-                }
-                
             }
+            
         }
+        
+        self.traves.sort { (collectionsOne, collectionsTwo) -> Bool in
+            return collectionsOne.first!.distanceResicence < collectionsTwo.first!.distanceResicence
+        }
+        
+//       self.traves = self.traves.filter { (collections) -> Bool in
+//        if let startDate =  collections.first?.startDate, let location = collections.first?.approximateLocation{
+//
+//            }
+//            re
+//        }
+        
+        // print the organized trave
+        if traves.count > 5{
+            traves.removeSubrange(0..<traves.count - 5)
+        }
+        
         // print the organized trave
         for trave in traves{
             let array = NSArray(array: trave)
             print(array.value(forKey: "localizedTitle"))
             print(array.value(forKey: "startDate"))
         }
-        
-        if traves.count > 7{
-            traves.removeSubrange(0..<traves.count - 7)
-        }
-        
-        for trave in traves{
-            let array = NSArray(array: trave)
-            print(array.value(forKey: "localizedTitle"))
-            print(array.value(forKey: "startDate"))
-        }
-        UIAlertView.init(title: nil, message: "you can look the trave", delegate: nil, cancelButtonTitle: "Good").show()
+
+    }
+}
+
+extension PHCollection{
+    private struct AssociateKeys{
+        static var distanceKey = "DISTANCE"
     }
     
-    public func dispathTimer(timeInterval : Double, repeatCount: Int, handler:@escaping (DispatchSourceTimer?, Int)->(), handlerCancle:@escaping() -> ())
-    {
-        if repeatCount <= 0 {
-            return
+    open var distanceResicence : Double{ //Distance from residence location
+        get{
+            return objc_getAssociatedObject(self, &AssociateKeys.distanceKey) as! Double
         }
-        let timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
-        var count = repeatCount
-        var index = 0
-        timer.schedule(wallDeadline: .now(), repeating: timeInterval)
-        timer.setEventHandler(handler: {
-            count -= 1
-            DispatchQueue.global().async {
-                handler(timer, count)
-                index += 1
-            }
-            if count == 0 {
-                
-                DispatchQueue.main.async {
-                    timer.cancel()
-                    handlerCancle()
-                }
-            }
-        })
-        timer.resume()
+        set{
+            objc_setAssociatedObject(self, &AssociateKeys.distanceKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
     }
 }
