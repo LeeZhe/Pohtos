@@ -19,6 +19,7 @@ class PCPhotoManager: ZLPhotoManager {
     var memoryAssets = [String : Array<PHFetchResult<PHAsset>>]()
     var allCollections = [PHAssetCollection]()
     var residence : String!
+    var localLacation : CLLocation!
     var traves = [[PHAssetCollection]]()
     open func getMoments(){
         
@@ -32,14 +33,16 @@ class PCPhotoManager: ZLPhotoManager {
             stop: UnsafeMutablePointer<ObjCBool>)  in
             
             // Find the moment where has title
-            if let place = object.localizedTitle?.split(separator: " ").first{
-                let placeStr = String(place)
-                if let _ = self.memories[placeStr]{
-                    self.memories[placeStr]?.append(object)
+            if let place = object.localizedTitle{
+//                print(place)
+//                print("startDate: \(object.startDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
+//                print("endDate: \(object.endDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
+                if let _ = self.memories[place]{
+                    self.memories[place]?.append(object)
                 }
                 else
                 {
-                    self.memories[placeStr] = [object]
+                    self.memories[place] = [object]
                 }
                 self.allCollections.append(object)
             }
@@ -61,55 +64,97 @@ class PCPhotoManager: ZLPhotoManager {
             }
         }
         if let maxKey = maxKey{
-            memories[maxKey] =  nil
             self.residence = maxKey
+            for collection in memories[maxKey]!{
+                if let location = collection.approximateLocation{
+                    self.localLacation = location
+                }
+            }
+            memories[maxKey] =  nil
         }
-        
-//        memories.removeAll()
     }
     
     private func organizeTravel(){
-       self.allCollections = self.allCollections.filter { (collection) -> Bool in
-        if let place = collection.localizedTitle?.split(separator: " ").first{
-                return place != self.residence
+        var placeMoments = [String : [PHAssetCollection]]()
+        for (key,collections) in memories{
+            guard collections.count <= 10 , collections.count > 0 else{
+                continue
             }
-            return true
+            
+            placeMoments[key] = collections
         }
-        var  collections = Array(allCollections)
-        for collection in self.allCollections{
-            if let startDate = collection.startDate{
-                let theOneTraves = collections.filter { (c_model) -> Bool in
-                    
-                    if let c_starDate = c_model.startDate{
-                        return abs(Int32(c_starDate.timeIntervalSince(startDate))) <= 5 * 86400
-                    }
-                    
-                    return false
-                }
-                
-                for place in theOneTraves{
-                   let idx = collections.index(of: place)
-                    if idx != nil{
-                        collections.remove(at: idx!)
-                    }
-                }
-                
-                if theOneTraves.count > 0{
-                    traves.append(theOneTraves)
-                }
-                
+        
+        
+        
+        // Filter the date continuous
+        placeMoments = placeMoments.filter { (arg) -> Bool in
+            
+            let (_, collections) = arg
+            let isSec = abs(Int32((collections.first?.startDate?.timeIntervalSince((collections.last?.startDate)!))!)) < 8 * 24 * 3600
+            
+            return isSec
+        }
+        var allValues = [PHAssetCollection]()
+        var tempValues = [PHAssetCollection]()
+        for collections in placeMoments.values{
+            for collection in collections{
+                allValues.append(collection)
+                tempValues.append(collection)
             }
         }
+        
+//        for collection in 
+        
+        
+        
+        
+        for (_, collections) in placeMoments{
+            
+            for collection in collections{
+                if let location = collection.approximateLocation{
+                    collection.distanceResicence = location.distance(from: self.localLacation)
+                }
+            }
+            
+        }
+        
+        self.traves.sort { (collectionsOne, collectionsTwo) -> Bool in
+            return collectionsOne.first!.distanceResicence < collectionsTwo.first!.distanceResicence
+        }
+        
+//       self.traves = self.traves.filter { (collections) -> Bool in
+//        if let startDate =  collections.first?.startDate, let location = collections.first?.approximateLocation{
+//
+//            }
+//            re
+//        }
+        
+        // print the organized trave
+        if traves.count > 5{
+            traves.removeSubrange(0..<traves.count - 5)
+        }
+        
         // print the organized trave
         for trave in traves{
             let array = NSArray(array: trave)
             print(array.value(forKey: "localizedTitle"))
             print(array.value(forKey: "startDate"))
         }
-        
-        if traves.count > 7{
-            traves.removeSubrange(0..<traves.count - 7)
+
+    }
+}
+
+extension PHCollection{
+    private struct AssociateKeys{
+        static var distanceKey = "DISTANCE"
+    }
+    
+    open var distanceResicence : Double{ //Distance from residence location
+        get{
+            return objc_getAssociatedObject(self, &AssociateKeys.distanceKey) as! Double
+        }
+        set{
+            objc_setAssociatedObject(self, &AssociateKeys.distanceKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
- 
 }
