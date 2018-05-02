@@ -44,7 +44,31 @@ class PCPhotoManager: ZLPhotoManager {
                 {
                     self.memories[place] = [object]
                 }
-                self.allCollections.append(object)
+//                self.allCollections.append(object)
+            }
+            else
+            {
+                /*
+                options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+
+                let assets = PHAsset.fetchAssets(in: object, options: options)
+                assets.enumerateObjects({ (asset, idx, stop: UnsafeMutablePointer<ObjCBool>) in
+                    if let loc = asset.location{
+                        let geo = CLGeocoder()
+                        geo.reverseGeocodeLocation(loc, completionHandler: { (places, error) in
+                            if error != nil{
+                                
+                                if let place = places?.first?.locality, let subplace = places?.first?.subLocality{
+                                    
+                                }
+                                
+                            }
+                        })
+                        
+                        stop.memory = true
+                    }
+                })
+ */
             }
             
         }
@@ -98,12 +122,34 @@ class PCPhotoManager: ZLPhotoManager {
         var tempValues = [PHAssetCollection]()
         for collections in placeMoments.values{
             for collection in collections{
+                guard (collection.approximateLocation?.distance(from: self.localLacation))! > 30 * 1000 else{
+                    continue
+                }
                 allValues.append(collection)
                 tempValues.append(collection)
             }
         }
         
-//        for collection in 
+        for collection in allValues{
+            let theOneTrave = tempValues.filter { (c_col) -> Bool in
+                var isSec = false
+                if let startDate = collection.startDate, let c_date = c_col.startDate{
+                    isSec = abs(Int32(startDate.timeIntervalSince(c_date))) < 7 * 86400
+                }
+                
+                var isLoc = false
+                
+                if let location = collection.approximateLocation , let c_location = c_col.approximateLocation{
+                    isLoc = location.distance(from: c_location) < 30 * 1000
+                }
+                
+                return isSec && isLoc
+            }
+            if self.traves.contains(theOneTrave) == false{
+                self.traves.append(theOneTrave)
+            }
+            
+        }
         
         
         
@@ -119,7 +165,7 @@ class PCPhotoManager: ZLPhotoManager {
         }
         
         self.traves.sort { (collectionsOne, collectionsTwo) -> Bool in
-            return collectionsOne.first!.distanceResicence < collectionsTwo.first!.distanceResicence
+            return collectionsOne.first!.startDate! < collectionsTwo.first!.startDate!
         }
         
 //       self.traves = self.traves.filter { (collections) -> Bool in
