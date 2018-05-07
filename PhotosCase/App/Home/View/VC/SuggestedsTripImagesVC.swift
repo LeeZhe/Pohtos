@@ -11,7 +11,7 @@ import UIKit
 private let reuseIdentifier = "Cell"
 
 class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegateFlowLayout {
-    var traves = [PHAssetCollection]()
+    var travels = [PHAssetCollection]()
     var assets = [[PHAsset]]()
     var m_model = MemoryModel()
     override func viewDidLoad() {
@@ -27,8 +27,8 @@ class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegat
         collectionView?.dataSource = self
 
         collectionView?.register(ReuseHeaderView.self , forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView")
-        let date = m_model.startDate?.dateFromString(dateStr: "MM-dd,YYYY") ?? ""
-        let endDate = m_model.endDate?.dateFromString(dateStr: "MM-dd,YYYY") ?? ""
+        let date = m_model.startDate?.dateFromString(dateStr: "MMM-dd") ?? ""
+        let endDate = m_model.endDate?.dateFromString(dateStr: "MMM-dd") ?? ""
         self.title = "\(date)-\(endDate)"
 
         // Do any additional setup after loading the view.
@@ -65,6 +65,8 @@ class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegat
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! DisplayCell
         // Configure the cell
+        
+        
         ZLPhotoManager.requestImage(for: m_model.theOneAssets[indexPath.section][indexPath.row], size: CGSize(width: (collectionView.frame.size.width - 3) / 4, height: (collectionView.frame.size.width - 3) / 4)) { (image, dict) in
             if let image = image{
                 cell.img.image = image
@@ -98,13 +100,7 @@ class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegat
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView", for: indexPath) as! ReuseHeaderView
         
-        if m_model.places.count > indexPath.section{
-            header.label.text = m_model.places[indexPath.section]
-        }
-        else
-        {
-            header.label.text = m_model.theOneAssets[indexPath.section].first?.creationDate?.dateFromString(dateStr: "dd-MM")
-        }
+        header.label.text = m_model.theOneAssets[indexPath.section].first?.creationDate?.dateFromString(dateStr: "dd,MMM")
         
 //        if let date = headerDicts[indexPath.row]["createDate"]{
 //            header.label.text = date as! String + " " + country

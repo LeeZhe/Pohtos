@@ -10,7 +10,7 @@ import UIKit
 import ZLPhotoBrowser
 class PCPhotoManager: ZLPhotoManager {
     static let defaultManager = PCPhotoManager()
-    
+
     private override init() {
         super.init()
     }
@@ -34,41 +34,18 @@ class PCPhotoManager: ZLPhotoManager {
             
             // Find the moment where has title
             if let place = object.localizedTitle{
-//                print(place)
-//                print("startDate: \(object.startDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
-//                print("endDate: \(object.endDate!.dateFromString(dateStr: "YYYY-MM-dd"))")
-                if let _ = self.memories[place]{
+
+                if let _  = self.memories[place]{
                     self.memories[place]?.append(object)
                 }
                 else
                 {
                     self.memories[place] = [object]
                 }
-//                self.allCollections.append(object)
             }
-            else
+            else if let _ = object.approximateLocation
             {
-                /*
-                options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-
-                let assets = PHAsset.fetchAssets(in: object, options: options)
-                assets.enumerateObjects({ (asset, idx, stop: UnsafeMutablePointer<ObjCBool>) in
-                    if let loc = asset.location{
-                        let geo = CLGeocoder()
-                        geo.reverseGeocodeLocation(loc, completionHandler: { (places, error) in
-                            if error != nil{
-                                
-                                if let place = places?.first?.locality, let subplace = places?.first?.subLocality{
-                                    
-                                }
-                                
-                            }
-                        })
-                        
-                        stop.memory = true
-                    }
-                })
- */
+                self.allCollections.append(object);
             }
             
         }
@@ -114,66 +91,90 @@ class PCPhotoManager: ZLPhotoManager {
         placeMoments = placeMoments.filter { (arg) -> Bool in
             
             let (_, collections) = arg
-            let isSec = abs(Int32((collections.first?.startDate?.timeIntervalSince((collections.last?.startDate)!))!)) < 8 * 24 * 3600
             
-            return isSec
+            guard collections.count == 1 else{
+                return true
+            }
+            
+            for i in 0..<collections.count - 1{
+                guard (collections[i].startDate?.timeIntervalSince(collections[i + 1].startDate!))! < 7 * 24 * 3600 else {
+                    return false
+                }
+            }
+            return true
         }
+        
         var allValues = [PHAssetCollection]()
-        var tempValues = [PHAssetCollection]()
         for collections in placeMoments.values{
             for collection in collections{
-                guard (collection.approximateLocation?.distance(from: self.localLacation))! > 30 * 1000 else{
+                
+                collection.distanceResicence = (collection.approximateLocation?.distance(from: self.localLacation))!
+                
+                
+                guard collection.distanceResicence > 30 * 1000, collection.estimatedAssetCount > 10 else{
                     continue
                 }
                 allValues.append(collection)
-                tempValues.append(collection)
             }
         }
         
-        for collection in allValues{
-            let theOneTrave = tempValues.filter { (c_col) -> Bool in
-                var isSec = false
-                if let startDate = collection.startDate, let c_date = c_col.startDate{
-                    isSec = abs(Int32(startDate.timeIntervalSince(c_date))) < 7 * 86400
+        for collection in self.allCollections{
+            if let location = collection.approximateLocation{
+                collection.distanceResicence = location.distance(from: self.localLacation)
+                guard collection.distanceResicence > 30 * 1000 , collection.estimatedAssetCount > 10 else{
+                    continue
                 }
-                
-                var isLoc = false
-                
-                if let location = collection.approximateLocation , let c_location = c_col.approximateLocation{
-                    isLoc = location.distance(from: c_location) < 30 * 1000
-                }
-                
-                return isSec && isLoc
+                allValues.append(collection)
             }
-            if self.traves.contains(theOneTrave) == false{
+        }
+        
+        
+        allValues.sort { (col1, col2) -> Bool in
+            return col1.startDate! < col2.startDate!
+        }
+        
+        var count = 0
+        while true{
+            var theOneTrave = [PHAssetCollection]()
+            for i in 0..<allValues.count{
+                
+                guard fabs(allValues.first!.distanceResicence / allValues[i].distanceResicence  - 1) < 0.15 ,
+                    Calendar.current.dateComponents([.day], from: (allValues.first?.startDate!)!, to: allValues[i].endDate!).day! < 7 else
+                {
+                    allValues.removeSubrange(0..<theOneTrave.count)
+                    
+                    if let endDate = self.traves.last?.last?.endDate, let startDate = theOneTrave.first?.startDate{
+                        
+                        guard Calendar.current.dateComponents([.day], from: endDate, to: startDate).day! > 1 else {
+                            self.traves[self.traves.count - 1].append(contentsOf: theOneTrave)
+                            break
+                        }
+                        
+                    }
+                    
+                    self.traves.append(theOneTrave)
+                    break;
+                }
+                theOneTrave.append(allValues[i])
+            }
+            
+            guard count != allValues.count else{
                 self.traves.append(theOneTrave)
+                break
             }
             
+            count = allValues.count
         }
         
-        
-        
-        
-        for (_, collections) in placeMoments{
-            
-            for collection in collections{
-                if let location = collection.approximateLocation{
-                    collection.distanceResicence = location.distance(from: self.localLacation)
-                }
-            }
-            
+        for trave in traves{
+            let array = NSArray(array: trave)
+            print(array.value(forKey: "localizedTitle"))
+            print(array.value(forKey: "startDate"))
         }
         
-        self.traves.sort { (collectionsOne, collectionsTwo) -> Bool in
-            return collectionsOne.first!.startDate! < collectionsTwo.first!.startDate!
-        }
-        
-//       self.traves = self.traves.filter { (collections) -> Bool in
-//        if let startDate =  collections.first?.startDate, let location = collections.first?.approximateLocation{
-//
-//            }
-//            re
-//        }
+        self.traves = self.traves.sorted(by: { (col1, col2) -> Bool in
+            return (col1.first?.startDate)! <  (col2.first?.startDate)!
+        })
         
         // print the organized trave
         if traves.count > 5{

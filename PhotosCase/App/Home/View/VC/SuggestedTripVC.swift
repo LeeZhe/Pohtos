@@ -13,7 +13,7 @@ private let reuseIdentifier = "Cell"
 class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLayout {
     var memories : [String : Array<PHAssetCollection>]?
     var sources = [MemoryModel]()
-    var traves = [[PHAssetCollection]]()
+    var travels = [[PHAssetCollection]]()
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -31,11 +31,11 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         collectionView?.dataSource = self
         
 //        collectionView?.register(ReuseHeaderView.self , forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView")
-        traves = PCPhotoManager.defaultManager.traves
+        travels = PCPhotoManager.defaultManager.traves
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         
-        for trave in traves
+        for trave in travels
         {
             
             
@@ -111,6 +111,7 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
             layout.minimumLineSpacing = 1
             let sugVC = SuggestedsTripImagesVC(collectionViewLayout: layout)
             sugVC.m_model = self.sources[indexPath.row]
+            sugVC.travels = self.travels[indexPath.row]
             navigationController?.pushViewController(sugVC, animated: true)
     }
 
@@ -290,7 +291,7 @@ class SuggestedTripCell: UICollectionViewCell {
             self.label.text = m_model.localizedLocationNames.first?.joined(separator: ",")
         }
         
-        self.timeLb.text = m_model.startDate?.dateFromString(dateStr: "MM-dd,yyyy")
+        self.timeLb.text = m_model.startDate?.dateFromString(dateStr: "MMM-dd,yyyy")
         self.picNo.text = "No." + String(m_model.allAssets.count)
         
     }

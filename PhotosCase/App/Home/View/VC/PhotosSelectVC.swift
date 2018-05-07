@@ -22,7 +22,6 @@ class PhotosSelectVC: UITableViewController {
     var dicts = Array<Dictionary<String , Any>>()
     var allDict = [Array<Dictionary<String , Any>>]()
     
-    let photosManager = PCPhotoManager.defaultManager
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,14 +39,17 @@ class PhotosSelectVC: UITableViewController {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem.init(title: "Photos Analysis", style: .plain, target: self, action: #selector(didSelectAnalysis))
         
-        photosManager.getMoments()
+        DispatchQueue.global().async {
+            PCPhotoManager.defaultManager.getMoments()
+        }
+
     }
+    
     
     @objc func didSelectAnalysis(){
         
         
         let traveSelectVC = TravePhotoSelVC()
-        traveSelectVC.memories = photosManager.memories
         navigationController?.pushViewController(traveSelectVC, animated: true)
         
         /*
