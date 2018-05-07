@@ -100,7 +100,7 @@ class SuggestedsTripImagesVC: UICollectionViewController,UICollectionViewDelegat
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView", for: indexPath) as! ReuseHeaderView
         
-        header.label.text = m_model.theOneAssets[indexPath.section].first?.creationDate?.dateFromString(dateStr: "dd,MMM")
+        header.label.text = m_model.theOneAssets[indexPath.section].first?.creationDate?.dateFromString(dateStr: "dd,MMM YYYY")
         
 //        if let date = headerDicts[indexPath.row]["createDate"]{
 //            header.label.text = date as! String + " " + country
