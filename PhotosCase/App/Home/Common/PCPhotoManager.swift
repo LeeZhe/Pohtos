@@ -77,27 +77,18 @@ class PCPhotoManager: ZLPhotoManager {
     
     private func organizeTravel(){
         var placeMoments = [String : [PHAssetCollection]]()
-        for (key,collections) in memories{
-            guard collections.count <= 10 , collections.count > 0 else{
-                continue
-            }
-            
-            placeMoments[key] = collections
-        }
-        
-        
-        
+      
         // Filter the date continuous
-        placeMoments = placeMoments.filter { (arg) -> Bool in
+        placeMoments = self.memories.filter { (arg) -> Bool in
             
             let (_, collections) = arg
             
-            guard collections.count == 1 else{
+            guard collections.count > 1 else{
                 return true
             }
             
             for i in 0..<collections.count - 1{
-                guard (collections[i].startDate?.timeIntervalSince(collections[i + 1].startDate!))! < 7 * 24 * 3600 else {
+                guard Calendar.current.dateComponents([.day], from: collections[i].startDate!, to: collections[i + 1].startDate!).day! < 5 else{
                     return false
                 }
             }
@@ -111,7 +102,7 @@ class PCPhotoManager: ZLPhotoManager {
                 collection.distanceResicence = (collection.approximateLocation?.distance(from: self.localLacation))!
                 
                 
-                guard collection.distanceResicence > 30 * 1000, collection.estimatedAssetCount > 10 else{
+                guard collection.distanceResicence > 30 * 1000 else{
                     continue
                 }
                 allValues.append(collection)
@@ -121,7 +112,7 @@ class PCPhotoManager: ZLPhotoManager {
         for collection in self.allCollections{
             if let location = collection.approximateLocation{
                 collection.distanceResicence = location.distance(from: self.localLacation)
-                guard collection.distanceResicence > 30 * 1000 , collection.estimatedAssetCount > 10 else{
+                guard collection.distanceResicence > 30 * 1000 else{
                     continue
                 }
                 allValues.append(collection)
@@ -166,26 +157,22 @@ class PCPhotoManager: ZLPhotoManager {
             count = allValues.count
         }
         
-        for trave in traves{
-            let array = NSArray(array: trave)
-            print(array.value(forKey: "localizedTitle"))
-            print(array.value(forKey: "startDate"))
-        }
-        
         self.traves = self.traves.sorted(by: { (col1, col2) -> Bool in
             return (col1.first?.startDate)! <  (col2.first?.startDate)!
         })
         
-        // print the organized trave
-        if traves.count > 5{
-            traves.removeSubrange(0..<traves.count - 5)
-        }
         
-        // print the organized trave
+        
+       self.traves =  self.traves.filter { (cols) -> Bool in
+            let arr : [Int] =  (cols as NSArray).value(forKeyPath: "estimatedAssetCount") as! [Int]
+            return arr.reduce(0, +) > 4
+        }
+
+        
+        
         for trave in traves{
             let array = NSArray(array: trave)
-            print(array.value(forKey: "localizedTitle"))
-            print(array.value(forKey: "startDate"))
+            print(array.value(forKey: "localizedTitle"),"date：", array.value(forKey: "startDate"))
         }
 
     }

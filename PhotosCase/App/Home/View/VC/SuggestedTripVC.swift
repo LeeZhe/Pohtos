@@ -32,6 +32,9 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
         
 //        collectionView?.register(ReuseHeaderView.self , forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "ReuseHeaderView")
         travels = PCPhotoManager.defaultManager.traves
+        
+        
+        
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         
@@ -79,7 +82,8 @@ class SuggestedTripVC: UICollectionViewController,UICollectionViewDelegateFlowLa
                     if let images = images{
                         self.sources.append(m_model)
                         m_model.displayImages = images
-                        self.collectionView?.reloadData()
+                        let indexPath = IndexPath.init(row: self.sources.count - 1, section: 0)
+                        self.collectionView?.insertItems(at: [indexPath])
                     }
                 }
             }
